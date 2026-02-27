@@ -1,64 +1,151 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cek Sertifikat KP</title>
+
 <style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
 body{
-  font-family: Arial;
-  background:#f4f6f9;
+  height:100vh;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
   display:flex;
   justify-content:center;
   align-items:center;
-  height:100vh;
 }
-.card{
+
+.container{
+  width:420px;
   background:white;
-  padding:30px;
-  border-radius:10px;
-  box-shadow:0 4px 15px rgba(0,0,0,0.1);
-  width:350px;
-  text-align:center;
+  padding:40px;
+  border-radius:20px;
+  box-shadow:0 15px 40px rgba(0,0,0,0.2);
+  animation: fadeIn 0.8s ease-in-out;
 }
+
+h2{
+  text-align:center;
+  margin-bottom:25px;
+  color:#2a5298;
+}
+
+.input-group{
+  margin-bottom:18px;
+}
+
 input{
   width:100%;
-  padding:10px;
-  margin:10px 0;
+  padding:12px 15px;
+  border-radius:10px;
+  border:1px solid #ddd;
+  font-size:14px;
+  transition:0.3s;
 }
+
+input:focus{
+  border-color:#2a5298;
+  outline:none;
+  box-shadow:0 0 5px rgba(42,82,152,0.4);
+}
+
 button{
   width:100%;
-  padding:10px;
-  background:#2c7be5;
-  color:white;
+  padding:12px;
   border:none;
+  border-radius:10px;
+  background:#2a5298;
+  color:white;
+  font-weight:bold;
   cursor:pointer;
+  transition:0.3s;
 }
-iframe{
+
+button:hover{
+  background:#1e3c72;
+}
+
+.message{
   margin-top:20px;
+  text-align:center;
+  font-size:14px;
+}
+
+.success{
+  color:green;
+}
+
+.error{
+  color:red;
+}
+
+iframe{
+  margin-top:25px;
   width:100%;
-  height:400px;
+  height:450px;
+  border-radius:10px;
+  border:1px solid #ddd;
+}
+
+.loading{
+  margin-top:15px;
+  text-align:center;
+  font-size:14px;
+  color:#555;
+}
+
+@keyframes fadeIn{
+  from{opacity:0; transform:translateY(20px);}
+  to{opacity:1; transform:translateY(0);}
 }
 </style>
 </head>
+
 <body>
 
-<div class="card">
-<h2>Cek Sertifikat KP</h2>
+<div class="container">
+  <h2>🔎 Cek Sertifikat KP</h2>
 
-<input type="text" id="nama" placeholder="Masukkan Nama Lengkap">
-<input type="text" id="nim" placeholder="Masukkan NIM">
+  <div class="input-group">
+    <input type="text" id="nama" placeholder="Masukkan Nama Lengkap">
+  </div>
 
-<button onclick="cekData()">Cek Sertifikat</button>
+  <div class="input-group">
+    <input type="text" id="nim" placeholder="Masukkan NIM">
+  </div>
 
-<div id="result"></div>
+  <button onclick="cekData()">Cek Sertifikat</button>
+
+  <div id="loading" class="loading"></div>
+  <div id="result" class="message"></div>
+  <div id="preview"></div>
 </div>
 
 <script>
+
 const scriptURL = "https://script.google.com/macros/s/AKfycbyxB5EQ-Y2paN2jQSF22owGWdVNJFVANFsZGge8Gqn9eJk4AThr0Oxa5i8IU_myljn2wQ/exec";
 
 function cekData(){
-  const nama = document.getElementById("nama").value;
-  const nim = document.getElementById("nim").value;
+
+  const nama = document.getElementById("nama").value.trim();
+  const nim = document.getElementById("nim").value.trim();
+
+  document.getElementById("result").innerHTML = "";
+  document.getElementById("preview").innerHTML = "";
+
+  if(nama === "" || nim === ""){
+    document.getElementById("result").innerHTML =
+      "<div class='error'>⚠ Harap isi Nama dan NIM</div>";
+    return;
+  }
+
+  document.getElementById("loading").innerHTML = "⏳ Memeriksa data...";
 
   fetch(scriptURL,{
     method:"POST",
@@ -66,16 +153,28 @@ function cekData(){
   })
   .then(res=>res.json())
   .then(data=>{
+
+    document.getElementById("loading").innerHTML = "";
+
     if(data.status==="success"){
       document.getElementById("result").innerHTML =
-        "<h3>Halo "+data.nama+"</h3>" +
+        "<div class='success'>✅ Halo "+data.nama+"</div>";
+
+      document.getElementById("preview").innerHTML =
         "<iframe src='"+data.link+"'></iframe>";
+
     } else {
       document.getElementById("result").innerHTML =
-        "<p style='color:red'>"+data.message+"</p>";
+        "<div class='error'>❌ "+data.message+"</div>";
     }
+  })
+  .catch(error=>{
+    document.getElementById("loading").innerHTML = "";
+    document.getElementById("result").innerHTML =
+      "<div class='error'>Terjadi kesalahan sistem</div>";
   });
 }
+
 </script>
 
 </body>
