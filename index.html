@@ -87,15 +87,16 @@ button:hover{
   color:#555;
 }
 
-/* ===== PDF FULL WIDTH SECTION ===== */
+/* ===== PDF SECTION ===== */
 .pdf-section{
   margin-top:40px;
   width:100%;
+  display:none;
 }
 
 .pdf-container{
   width:100%;
-  height:80vh; /* Tinggi besar biar landscape terasa */
+  height:80vh;
   margin-top:20px;
 }
 
@@ -134,7 +135,7 @@ button:hover{
 </div>
 
 <!-- PDF FULL AREA -->
-<div id="previewSection" class="pdf-section" style="display:none;">
+<div id="previewSection" class="pdf-section">
   <div class="pdf-container" id="preview"></div>
 </div>
 
@@ -147,17 +148,21 @@ function cekData(){
   const nama = document.getElementById("nama").value.trim();
   const nim = document.getElementById("nim").value.trim();
 
-  document.getElementById("result").innerHTML="";
-  document.getElementById("preview").innerHTML="";
-  document.getElementById("previewSection").style.display="none";
+  const result = document.getElementById("result");
+  const loading = document.getElementById("loading");
+  const preview = document.getElementById("preview");
+  const previewSection = document.getElementById("previewSection");
+
+  result.innerHTML="";
+  preview.innerHTML="";
+  previewSection.style.display="none";
 
   if(nama===""||nim===""){
-    document.getElementById("result").innerHTML=
-      "<div class='error'>⚠ Harap isi Nama dan NIM</div>";
+    result.innerHTML="<div class='error'>⚠ Harap isi Nama dan NIM</div>";
     return;
   }
 
-  document.getElementById("loading").innerHTML="⏳ Memeriksa data...";
+  loading.innerHTML="⏳ Memeriksa data...";
 
   fetch(scriptURL,{
     method:"POST",
@@ -166,16 +171,21 @@ function cekData(){
   .then(res=>res.json())
   .then(data=>{
 
-    document.getElementById("loading").innerHTML="";
+    loading.innerHTML="";
 
     if(data.status==="success"){
 
-      document.getElementById("result").innerHTML=
-        "<div class='success'>✅ Halo "+data.nama+"</div>";
+      // 🔥 VALIDASI LINK WAJIB ADA
+      if(!data.link || data.link.trim()===""){
+        result.innerHTML="<div class='error'>⚠ Sertifikat belum tersedia. Silakan hubungi admin.</div>";
+        return;
+      }
 
-      document.getElementById("previewSection").style.display="block";
+      result.innerHTML="<div class='success'>✅ Halo "+data.nama+"</div>";
 
-      document.getElementById("preview").innerHTML=
+      previewSection.style.display="block";
+
+      preview.innerHTML=
         "<iframe src='"+data.link+"#view=FitH'></iframe>";
 
       window.scrollTo({
@@ -184,15 +194,13 @@ function cekData(){
       });
 
     }else{
-      document.getElementById("result").innerHTML=
-        "<div class='error'>❌ "+data.message+"</div>";
+      result.innerHTML="<div class='error'>❌ "+data.message+"</div>";
     }
 
   })
   .catch(error=>{
-    document.getElementById("loading").innerHTML="";
-    document.getElementById("result").innerHTML=
-      "<div class='error'>Data Tidak Ditemukan</div>";
+    loading.innerHTML="";
+    result.innerHTML="<div class='error'>❌ Terjadi kesalahan sistem</div>";
   });
 }
 
