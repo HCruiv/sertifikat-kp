@@ -40,6 +40,15 @@ h2{
   margin-bottom:18px;
 }
 
+label{
+  display:block;
+  margin-bottom:8px;
+  font-size:13px;
+  font-weight:600;
+  color:#2a5298;
+  letter-spacing:0.5px;
+}
+
 input{
   width:100%;
   padding:12px 15px;
@@ -94,10 +103,32 @@ button:hover{
   display:none;
 }
 
+.pdf-actions{
+  text-align:right;
+  margin-bottom:15px;
+}
+
+#downloadBtn{
+  width:auto;
+  padding:10px 18px;
+  border:none;
+  border-radius:8px;
+  background:red;
+  color:white;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+#downloadBtn:hover{
+  background:#16305c;
+  transform:translateY(-2px);
+}
+
 .pdf-container{
   width:100%;
   height:80vh;
-  margin-top:20px;
 }
 
 .pdf-container iframe{
@@ -121,11 +152,13 @@ button:hover{
   <h2>🔎 Cek Sertifikat KP</h2>
 
   <div class="input-group">
-    <input type="text" autocomplete="off" id="nama" placeholder="Masukkan Nama Lengkap">
+    <label for="nama">Nama Lengkap</label>
+    <input type="text" id="nama" autocomplete="off" placeholder="Masukkan Nama Lengkap">
   </div>
 
   <div class="input-group">
-    <input type="text" autocomplete="off" id="nim" placeholder="Masukkan NIM">
+    <label for="nim">NIM</label>
+    <input type="text" id="nim" autocomplete="off" placeholder="Masukkan NIM">
   </div>
 
   <button onclick="cekData()">Cek Sertifikat</button>
@@ -136,12 +169,20 @@ button:hover{
 
 <!-- PDF FULL AREA -->
 <div id="previewSection" class="pdf-section">
+
+  <div class="pdf-actions">
+    <button id="downloadBtn" onclick="downloadFile()">⬇ Download Sertifikat</button>
+  </div>
+
   <div class="pdf-container" id="preview"></div>
+
 </div>
 
 <script>
 
 const scriptURL = "https://script.google.com/macros/s/AKfycbyxB5EQ-Y2paN2jQSF22owGWdVNJFVANFsZGge8Gqn9eJk4AThr0Oxa5i8IU_myljn2wQ/exec";
+
+let currentLink = "";
 
 function cekData(){
 
@@ -156,6 +197,7 @@ function cekData(){
   result.innerHTML="";
   preview.innerHTML="";
   previewSection.style.display="none";
+  currentLink="";
 
   if(nama===""||nim===""){
     result.innerHTML="<div class='error'>⚠ Harap isi Nama dan NIM</div>";
@@ -175,13 +217,14 @@ function cekData(){
 
     if(data.status==="success"){
 
-      // 🔥 VALIDASI LINK WAJIB ADA
       if(!data.link || data.link.trim()===""){
         result.innerHTML="<div class='error'>⚠ Sertifikat belum tersedia. Silakan hubungi admin.</div>";
         return;
       }
 
       result.innerHTML="<div class='success'>✅ Halo "+data.nama+"</div>";
+
+      currentLink = data.link;
 
       previewSection.style.display="block";
 
@@ -202,6 +245,22 @@ function cekData(){
     loading.innerHTML="";
     result.innerHTML="<div class='error'>❌ Terjadi kesalahan sistem</div>";
   });
+}
+
+function downloadFile(){
+
+  if(!currentLink) return;
+
+  const fileIdMatch = currentLink.match(/\/d\/(.*?)\//);
+
+  if(fileIdMatch){
+    const fileId = fileIdMatch[1];
+    const downloadURL = "https://drive.google.com/uc?export=download&id=" + fileId;
+    window.open(downloadURL, "_blank");
+  } else {
+    window.open(currentLink, "_blank");
+  }
+
 }
 
 </script>
