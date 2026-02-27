@@ -10,24 +10,24 @@
   margin:0;
   padding:0;
   box-sizing:border-box;
-  font-family: 'Segoe UI', sans-serif;
+  font-family:'Segoe UI', sans-serif;
 }
 
 body{
-  height:100vh;
-  background: linear-gradient(135deg, #1e3c72, #2a5298);
-  display:flex;
-  justify-content:center;
-  align-items:center;
+  min-height:100vh;
+  background:linear-gradient(135deg,#1e3c72,#2a5298);
+  padding:40px 20px;
 }
 
+/* ===== FORM CARD ===== */
 .container{
-  width:420px;
+  max-width:500px;
+  margin:auto;
   background:white;
   padding:40px;
   border-radius:20px;
   box-shadow:0 15px 40px rgba(0,0,0,0.2);
-  animation: fadeIn 0.8s ease-in-out;
+  animation:fadeIn 0.8s ease-in-out;
 }
 
 h2{
@@ -77,27 +77,34 @@ button:hover{
   font-size:14px;
 }
 
-.success{
-  color:green;
-}
-
-.error{
-  color:red;
-}
-
-iframe{
-  margin-top:25px;
-  width:100%;
-  height:450px;
-  border-radius:10px;
-  border:1px solid #ddd;
-}
+.success{color:green;}
+.error{color:red;}
 
 .loading{
   margin-top:15px;
   text-align:center;
   font-size:14px;
   color:#555;
+}
+
+/* ===== PDF FULL WIDTH SECTION ===== */
+.pdf-section{
+  margin-top:40px;
+  width:100%;
+}
+
+.pdf-container{
+  width:100%;
+  height:80vh; /* Tinggi besar biar landscape terasa */
+  margin-top:20px;
+}
+
+.pdf-container iframe{
+  width:100%;
+  height:100%;
+  border:none;
+  border-radius:15px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.3);
 }
 
 @keyframes fadeIn{
@@ -124,7 +131,11 @@ iframe{
 
   <div id="loading" class="loading"></div>
   <div id="result" class="message"></div>
-  <div id="preview"></div>
+</div>
+
+<!-- PDF FULL AREA -->
+<div id="previewSection" class="pdf-section" style="display:none;">
+  <div class="pdf-container" id="preview"></div>
 </div>
 
 <script>
@@ -136,42 +147,52 @@ function cekData(){
   const nama = document.getElementById("nama").value.trim();
   const nim = document.getElementById("nim").value.trim();
 
-  document.getElementById("result").innerHTML = "";
-  document.getElementById("preview").innerHTML = "";
+  document.getElementById("result").innerHTML="";
+  document.getElementById("preview").innerHTML="";
+  document.getElementById("previewSection").style.display="none";
 
-  if(nama === "" || nim === ""){
-    document.getElementById("result").innerHTML =
+  if(nama===""||nim===""){
+    document.getElementById("result").innerHTML=
       "<div class='error'>⚠ Harap isi Nama dan NIM</div>";
     return;
   }
 
-  document.getElementById("loading").innerHTML = "⏳ Memeriksa data...";
+  document.getElementById("loading").innerHTML="⏳ Memeriksa data...";
 
   fetch(scriptURL,{
     method:"POST",
-    body: JSON.stringify({nama:nama,nim:nim})
+    body:JSON.stringify({nama:nama,nim:nim})
   })
   .then(res=>res.json())
   .then(data=>{
 
-    document.getElementById("loading").innerHTML = "";
+    document.getElementById("loading").innerHTML="";
 
     if(data.status==="success"){
-      document.getElementById("result").innerHTML =
+
+      document.getElementById("result").innerHTML=
         "<div class='success'>✅ Halo "+data.nama+"</div>";
 
-      document.getElementById("preview").innerHTML =
-        "<iframe src='"+data.link+"'></iframe>";
+      document.getElementById("previewSection").style.display="block";
 
-    } else {
-      document.getElementById("result").innerHTML =
+      document.getElementById("preview").innerHTML=
+        "<iframe src='"+data.link+"#view=FitH'></iframe>";
+
+      window.scrollTo({
+        top:document.body.scrollHeight,
+        behavior:"smooth"
+      });
+
+    }else{
+      document.getElementById("result").innerHTML=
         "<div class='error'>❌ "+data.message+"</div>";
     }
+
   })
   .catch(error=>{
-    document.getElementById("loading").innerHTML = "";
-    document.getElementById("result").innerHTML =
-      "<div class='error'>Data Tidak DItemukan</div>";
+    document.getElementById("loading").innerHTML="";
+    document.getElementById("result").innerHTML=
+      "<div class='error'>Data Tidak Ditemukan</div>";
   });
 }
 
