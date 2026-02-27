@@ -3,9 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
 <title>Cek Sertifikat KP</title>
 
 <style>
@@ -167,14 +164,10 @@ function cekData(){
 
   loading.innerHTML="⏳ Memeriksa data...";
 
-  fetch(scriptURL + "?t=" + new Date().getTime(), {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify({nama:nama,nim:nim}),
-    cache: "no-store"
-})
+  fetch(scriptURL,{
+    method:"POST",
+    body:JSON.stringify({nama:nama,nim:nim})
+  })
   .then(res=>res.json())
   .then(data=>{
 
@@ -192,8 +185,8 @@ function cekData(){
 
       previewSection.style.display="block";
 
-      preview.innerHTML =
-  "<iframe src='"+data.link+"?t="+new Date().getTime()+"#view=FitH'></iframe>";
+      preview.innerHTML=
+        "<iframe src='"+data.link+"#view=FitH'></iframe>";
 
       window.scrollTo({
         top:document.body.scrollHeight,
