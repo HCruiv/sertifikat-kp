@@ -180,7 +180,7 @@ button:hover{
 
 <script>
 
-const scriptURL = "https://script.google.com/macros/s/AKfycbyxB5EQ-Y2paN2jQSF22owGWdVNJFVANFsZGge8Gqn9eJk4AThr0Oxa5i8IU_myljn2wQ/exec";
+const scriptURL = "https://script.google.com/macros/s/AKfycbzxMaCrz8I8TLydk7Hc7UAcBxQ-3BpSTg0Ajq34ropeh_8iLG-KKISNDGR_UxlNoPAP0g/exec";
 
 let currentLink = "";
 
@@ -206,8 +206,10 @@ function cekData(){
 
   loading.innerHTML="⏳ Memeriksa data...";
 
-  fetch(scriptURL + "?nama=" + encodeURIComponent(nama) + 
-      "&nim=" + encodeURIComponent(nim))
+  fetch(scriptURL,{
+    method:"POST",
+    body:JSON.stringify({nama:nama,nim:nim})
+  })
   .then(res=>res.json())
   .then(data=>{
 
