@@ -206,10 +206,8 @@ function cekData(){
 
   loading.innerHTML="⏳ Memeriksa data...";
 
-  fetch(scriptURL,{
-    method:"POST",
-    body:JSON.stringify({nama:nama,nim:nim})
-  })
+  fetch(scriptURL + "?nama=" + encodeURIComponent(nama) + 
+      "&nim=" + encodeURIComponent(nim))
   .then(res=>res.json())
   .then(data=>{
 
